@@ -5,16 +5,16 @@
   "main": "index",
   "repository": {
     "type": "git",
-    "url": "git://github.com/tommy351/hexo-plugins.git"
+    "url": "https://github.com/hexojs/hexo-migrator-wordpress.git"
   },
-  "keywords": ["website", "blog", "cms", "framework", "hexo"],
+  "bugs": {
+    "url": "https://github.com/hexojs/hexo-migrator-wordpress/issues"
+  },
+  "keywords": ["hexo", "wordpress"],
   "author": "Tommy Chen <tommy351@gmail.com> (http://zespia.tw)",
   "license": {
     "type": "MIT",
     "url": "https://raw.github.com/tommy351/hexo/master/LICENSE"
-  },
-  "engines": {
-    "hexo": "*"
   },
   "dependencies": {
     "xml2js": "*",

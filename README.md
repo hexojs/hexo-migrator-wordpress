@@ -1,28 +1,21 @@
-# [Hexo] Plugins
+# WordPress migrator
 
-Official plugins for [Hexo].
+Migrate your blog from WordPress to [Hexo].
 
-- [Plugin List](https://github.com/tommy351/hexo/wiki/Plugins)
-- [Plugin development](http://zespia.tw/hexo/docs/plugins.html)
+## Install
+
+```
+$ npm install hexo-migrator-wordpress --save
+```
 
 ## Usage
 
-### Install
+Export your WordPress in "Tools" → "Export" → "WordPress" in your dashboard.
+
+Execute the following command after installed. `source` is the file path or URL of WordPress export file.
 
 ```
-npm install <plugin-name> --save
-```
-
-### Update
-
-```
-npm update
-```
-
-### Uninstall
-
-```
-npm uninstall <plugin-name>
+hexo migrate wordpress <source>
 ```
 
 [Hexo]: http://zespia.tw/hexo
