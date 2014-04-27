@@ -10,17 +10,20 @@
   "bugs": {
     "url": "https://github.com/hexojs/hexo-migrator-wordpress/issues"
   },
-  "keywords": ["hexo", "wordpress"],
+  "keywords": [
+    "hexo",
+    "wordpress",
+    "migrator"
+  ],
   "author": "Tommy Chen <tommy351@gmail.com> (http://zespia.tw)",
   "license": {
     "type": "MIT",
-    "url": "https://raw.github.com/tommy351/hexo/master/LICENSE"
+    "url": "https://raw.github.com/hexojs/hexo-migrator-wordpress/master/LICENSE"
   },
   "dependencies": {
-    "xml2js": "*",
-    "request": "*",
-    "async": "*",
-    "underscore": "*",
-    "to-markdown": "*"
+    "async": "0.7.0",
+    "to-markdown": "0.0.1",
+    "xml2js": "0.4.2",
+    "request": "2.34.0"
   }
 }
