@@ -1,6 +1,6 @@
 {
   "name": "hexo-migrator-wordpress",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WordPress migrator plugin for Hexo",
   "main": "index",
   "repository": {
@@ -21,9 +21,9 @@
     "url": "https://raw.github.com/hexojs/hexo-migrator-wordpress/master/LICENSE"
   },
   "dependencies": {
-    "async": "0.7.0",
+    "async": "^0.9.0",
     "to-markdown": "0.0.1",
     "xml2js": "0.4.2",
-    "request": "2.34.0"
+    "request": "^2.36.0"
   }
 }
