@@ -3,7 +3,7 @@ var xml2js = require('xml2js'),
   tomd = require('to-markdown').toMarkdown,
   request = require('request'),
   util = hexo.util,
-  file = util.file2;
+  file = require('fs');
 
 var captialize = function(str){
   return str[0].toUpperCase() + str.substring(1);
