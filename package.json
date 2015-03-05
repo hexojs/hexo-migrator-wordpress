@@ -1,25 +1,16 @@
 {
   "name": "hexo-migrator-wordpress",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "WordPress migrator plugin for Hexo",
   "main": "index",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hexojs/hexo-migrator-wordpress.git"
-  },
-  "bugs": {
-    "url": "https://github.com/hexojs/hexo-migrator-wordpress/issues"
-  },
+  "repository": "hexojs/hexo-migrator-wordpress",
   "keywords": [
     "hexo",
     "wordpress",
     "migrator"
   ],
   "author": "Tommy Chen <tommy351@gmail.com> (http://zespia.tw)",
-  "license": {
-    "type": "MIT",
-    "url": "https://raw.github.com/hexojs/hexo-migrator-wordpress/master/LICENSE"
-  },
+  "license": "MIT",
   "dependencies": {
     "async": "^0.9.0",
     "to-markdown": "0.0.1",

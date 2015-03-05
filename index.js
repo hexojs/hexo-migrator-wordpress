@@ -2,7 +2,6 @@ var xml2js = require('xml2js'),
   async = require('async'),
   tomd = require('to-markdown').toMarkdown,
   request = require('request'),
-  util = hexo.util,
   file = require('fs');
 
 var captialize = function(str){
