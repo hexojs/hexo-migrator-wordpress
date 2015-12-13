@@ -7,7 +7,15 @@ var xml2js = require('xml2js'),
 var captialize = function(str){
   return str[0].toUpperCase() + str.substring(1);
 };
-
+function replaceHTMLEntity(str){
+    str = str.replace(/amp;/g, '');
+    str = str.replace(/&lt;/g, '<');
+    str = str.replace(/&gt;/g, '>');
+    str = str.replace(/&quot;/g, '"');
+    str = str.replace(/&#92;/g, '\\');
+    str = str.replace(/&#48;/g, '0');
+    return str;
+};
 hexo.extend.migrator.register('wordpress', function(args, callback){
   var source = args._.shift();
 
@@ -64,7 +72,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
-
+        content = replaceHTMLEntity(content);
         content = tomd(content).replace(/\r\n/g, '\n');
         count++;
 
