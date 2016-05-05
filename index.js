@@ -53,7 +53,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           return next();
         }
 
-        var title = item.title[0],
+        var title = item.title[0].replace(/"/g, "\\\""),
           id = item['wp:post_id'][0],
           date = item['wp:post_date'][0],
           slug = item['wp:post_name'][0],
