@@ -89,6 +89,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
 
         var data = {
           title: title || slug,
+          url: +id+".html",
           id: +id,
           date: date,
           content: content,
