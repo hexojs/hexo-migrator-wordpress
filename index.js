@@ -73,6 +73,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           categories = [],
           tags = [];
 
+        if (slug) slug = decodeURI(slug);
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
