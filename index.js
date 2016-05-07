@@ -8,28 +8,28 @@ var captialize = function(str){
   return str[0].toUpperCase() + str.substring(1);
 };
 function replaceTwoBrace(str){
-    str = str.replace(/{{/g, '{ {');
-    return str;
+  str = str.replace(/{{/g, '{ {');
+  return str;
 };
 function replaceHTMLEntity(str){
-    str = str.replace(/amp;/g, '');
-    str = str.replace(/&lt;/g, '<');
-    str = str.replace(/&gt;/g, '>');
-    str = str.replace(/&quot;/g, '"');
-    str = str.replace(/&#92;/g, '\\');
-    str = str.replace(/&#48;/g, '0');
-    return str;
+  str = str.replace(/amp;/g, '');
+  str = str.replace(/&lt;/g, '<');
+  str = str.replace(/&gt;/g, '>');
+  str = str.replace(/&quot;/g, '"');
+  str = str.replace(/&#92;/g, '\\');
+  str = str.replace(/&#48;/g, '0');
+  return str;
 };
 function replaceCodeTag(str){
-    str = str.replace(/\[python\]/gi, '```');
-    str = str.replace(/\[\/python\]/gi, '```');
-    str = str.replace(/\[java\]/gi, '```');
-    str = str.replace(/\[\/java\]/gi, '```');
-    str = str.replace(/\[php\]/gi, '```');
-    str = str.replace(/\[\/php\]/gi, '```');
-    str = str.replace(/\[c\]/gi, '```');
-    str = str.replace(/\[\/c\]/gi, '```');
-    return str;
+  str = str.replace(/\[python\]/gi, '```');
+  str = str.replace(/\[\/python\]/gi, '```');
+  str = str.replace(/\[java\]/gi, '```');
+  str = str.replace(/\[\/java\]/gi, '```');
+  str = str.replace(/\[php\]/gi, '```');
+  str = str.replace(/\[\/php\]/gi, '```');
+  str = str.replace(/\[c\]/gi, '```');
+  str = str.replace(/\[\/c\]/gi, '```');
+  return str;
 };
 hexo.extend.migrator.register('wordpress', function(args, callback){
   var source = args._.shift();
