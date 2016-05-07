@@ -20,17 +20,6 @@ function replaceHTMLEntity(str){
   str = str.replace(/&#48;/g, '0');
   return str;
 };
-function replaceCodeTag(str){
-  str = str.replace(/\[python\]/gi, '```');
-  str = str.replace(/\[\/python\]/gi, '```');
-  str = str.replace(/\[java\]/gi, '```');
-  str = str.replace(/\[\/java\]/gi, '```');
-  str = str.replace(/\[php\]/gi, '```');
-  str = str.replace(/\[\/php\]/gi, '```');
-  str = str.replace(/\[c\]/gi, '```');
-  str = str.replace(/\[\/c\]/gi, '```');
-  return str;
-};
 hexo.extend.migrator.register('wordpress', function(args, callback){
   var source = args._.shift();
 
@@ -83,12 +72,11 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           type = item['wp:post_type'][0],
           categories = [],
           tags = [];
-
+        if (slug) slug = decodeURI(slug);
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
         content = replaceTwoBrace(content);
-        content = replaceCodeTag(content);
         content = replaceHTMLEntity(content);
         content = tomd(content).replace(/\r\n/g, '\n');
         count++;
