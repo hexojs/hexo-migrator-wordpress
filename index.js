@@ -61,8 +61,18 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           comment = item['wp:comment_status'][0],
           status = item['wp:status'][0],
           type = item['wp:post_type'][0],
+          excerpt = item['excerpt:encoded'][0]
           categories = [],
           tags = [];
+
+
+        // Trashed posts may show up in the Wordpress
+        // export. This treat them as drafts so they
+        // don't mistakenly end up published.  
+        if (item['link'][0].match(/__trashed/g)) {
+          status = 'draft';
+        }
+
 
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
@@ -93,6 +103,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           id: +id,
           date: date,
           content: content,
+          excerpt: excerpt,
           layout: status === 'draft' ? 'draft' : 'post',
         };
 
