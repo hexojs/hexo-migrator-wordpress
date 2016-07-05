@@ -61,6 +61,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           comment = item['wp:comment_status'][0],
           status = item['wp:status'][0],
           type = item['wp:post_type'][0],
+          excerpt = item['excerpt:encoded'][0]
           categories = [],
           tags = [];
 
@@ -93,6 +94,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           id: +id,
           date: date,
           content: content,
+          excerpt: excerpt,
           layout: status === 'draft' ? 'draft' : 'post',
         };
 
