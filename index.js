@@ -65,6 +65,15 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           categories = [],
           tags = [];
 
+
+        // Trashed posts may show up in the Wordpress
+        // export. This treat them as drafts so they
+        // don't mistakenly end up published.  
+        if (item['link'][0].match(/__trashed/g)) {
+          status = 'draft';
+        }
+
+
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
