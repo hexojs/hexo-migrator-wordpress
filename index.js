@@ -8,8 +8,17 @@ var captialize = function(str){
   return str[0].toUpperCase() + str.substring(1);
 };
 function replaceTwoBrace(str){
-    str = str.replace(/{{/g, '{ {');
-    return str;
+  str = str.replace(/{{/g, '{ {');
+  return str;
+};
+function replaceHTMLEntity(str){
+  str = str.replace(/amp;/g, '');
+  str = str.replace(/&lt;/g, '<');
+  str = str.replace(/&gt;/g, '>');
+  str = str.replace(/&quot;/g, '"');
+  str = str.replace(/&#92;/g, '\\');
+  str = str.replace(/&#48;/g, '0');
+  return str;
 };
 hexo.extend.migrator.register('wordpress', function(args, callback){
   var source = args._.shift();
@@ -64,10 +73,12 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
           categories = [],
           tags = [];
 
+        if (slug) slug = decodeURI(slug);
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
         content = replaceTwoBrace(content);
+        content = replaceHTMLEntity(content);
         content = tomd(content).replace(/\r\n/g, '\n');
         count++;
 
