@@ -69,7 +69,6 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
-        console.log(content);
         content = replaceTwoBrace(content);
         content = turndownService.turndown(content).replace(/\r\n/g, '\n');
         count++;
