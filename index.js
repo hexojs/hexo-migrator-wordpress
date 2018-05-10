@@ -1,8 +1,10 @@
 var xml2js = require('xml2js'),
   async = require('async'),
-  tomd = require('to-markdown').toMarkdown,
+  TurndownService = require('turndown'),
   request = require('request'),
   file = require('fs');
+
+var turndownService = new TurndownService();
 
 var captialize = function(str){
   return str[0].toUpperCase() + str.substring(1);
@@ -68,7 +70,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback){
         if (type !== 'post' && type !== 'page') return next();
         if (typeof content !== 'string') content = '';
         content = replaceTwoBrace(content);
-        content = tomd(content).replace(/\r\n/g, '\n');
+        content = turndownService.turndown(content).replace(/\r\n/g, '\n');
         count++;
 
         if (item.category){
