@@ -1,0 +1,17 @@
+language: node_js
+
+cache:
+  npm: true
+
+node_js:
+  - "8"
+  - "10"
+  - "node"
+
+script:
+  - npm run eslint
+  - npm run test-cov
+
+after_script:
+  - npm install coveralls
+  - nyc report --reporter=text-lcov | coveralls
