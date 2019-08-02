@@ -28,5 +28,8 @@
     "eslint-config-hexo": "^3.0.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1"
+  },
+  "engines": {
+    "node": ">= 8.6.0"
   }
 }
