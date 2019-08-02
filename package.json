@@ -2,7 +2,10 @@
   "name": "hexo-migrator-wordpress",
   "version": "1.0.0",
   "description": "WordPress migrator plugin for Hexo",
-  "main": "index",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "test": "mocha test/index.js",
     "test-cov": "nyc npm run test",
