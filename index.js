@@ -2,26 +2,26 @@
 
 /* global hexo */
 
-var xml2js = require('xml2js');
-var async = require('async');
-var TurndownService = require('turndown');
-var request = require('request');
-var file = require('fs');
+const xml2js = require('xml2js');
+const async = require('async');
+const TurndownService = require('turndown');
+const request = require('request');
+const file = require('fs');
 
-var turndownService = new TurndownService();
+const turndownService = new TurndownService();
 
-var captialize = function(str) {
+const captialize = function(str) {
   return str[0].toUpperCase() + str.substring(1);
 };
 function replaceTwoBrace(str) {
   str = str.replace(/{{/g, '{ {');
   return str;
 }
-hexo.extend.migrator.register('wordpress', function(args, callback) {
-  var source = args._.shift();
+hexo.extend.migrator.register('wordpress', (args, callback) => {
+  const source = args._.shift();
 
   if (!source) {
-    var help = [
+    const help = [
       'Usage: hexo migrate wordpress <source>',
       '',
       'For more help, you can check the docs: http://hexo.io/docs/migration.html'
@@ -31,8 +31,8 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
     return callback();
   }
 
-  var log = hexo.log;
-  var post = hexo.post;
+  const log = hexo.log;
+  const post = hexo.post;
 
   log.i('Analyzing %s...', source);
 
@@ -40,7 +40,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
     function(next) {
       // URL regular expression from: http://blog.mattheworiordan.com/post/13174566389/url-regular-expression-for-links-with-or-without-the
       if (source.match(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\w]*))?)/)) {
-        request(source, function(err, res, body) {
+        request(source, (err, res, body) => {
           if (err) throw err;
           if (res.statusCode === 200) next(null, body);
         });
@@ -52,23 +52,23 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
       xml2js.parseString(content, next);
     },
     function(xml, next) {
-      var count = 0;
+      let count = 0;
 
-      async.each(xml.rss.channel[0].item, function(item, next) {
+      async.each(xml.rss.channel[0].item, (item, next) => {
         if (!item['wp:post_type']) {
           return next();
         }
 
-        var title = item.title[0].replace(/"/g, '\\"');
-        var id = item['wp:post_id'][0];
-        var date = item['wp:post_date'][0];
-        var slug = item['wp:post_name'][0];
-        var content = item['content:encoded'][0];
-        var comment = item['wp:comment_status'][0];
-        var status = item['wp:status'][0];
-        var type = item['wp:post_type'][0];
-        var categories = [];
-        var tags = [];
+        const title = item.title[0].replace(/"/g, '\\"');
+        const id = item['wp:post_id'][0];
+        const date = item['wp:post_date'][0];
+        const slug = item['wp:post_name'][0];
+        let content = item['content:encoded'][0];
+        const comment = item['wp:comment_status'][0];
+        const status = item['wp:status'][0];
+        const type = item['wp:post_type'][0];
+        const categories = [];
+        const tags = [];
 
         if (!title && !slug) return next();
         if (type !== 'post' && type !== 'page') return next();
@@ -78,8 +78,8 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
         count++;
 
         if (item.category) {
-          item.category.forEach(function(category, next) {
-            var name = category._;
+          item.category.forEach((category, next) => {
+            const name = category._;
 
             switch (category.$.domain) {
               case 'category':
@@ -93,7 +93,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
           });
         }
 
-        var data = {
+        const data = {
           title: title || slug,
           url: +id + '.html',
           id: +id,
@@ -110,7 +110,7 @@ hexo.extend.migrator.register('wordpress', function(args, callback) {
 
         log.i('%s found: %s', captialize(type), title);
         post.create(data, next);
-      }, function(err) {
+      }, err => {
         if (err) return next(err);
 
         log.i('%d posts migrated.', count);
