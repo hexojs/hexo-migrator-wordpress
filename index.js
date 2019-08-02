@@ -13,10 +13,12 @@ const turndownService = new TurndownService();
 const captialize = function(str) {
   return str[0].toUpperCase() + str.substring(1);
 };
+
 function replaceTwoBrace(str) {
   str = str.replace(/{{/g, '{ {');
   return str;
 }
+
 hexo.extend.migrator.register('wordpress', (args, callback) => {
   const source = args._.shift();
 
