@@ -2,7 +2,15 @@
   "name": "hexo-migrator-wordpress",
   "version": "1.0.0",
   "description": "WordPress migrator plugin for Hexo",
-  "main": "index",
+  "main": "index.js",
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "mocha test/index.js",
+    "test-cov": "nyc npm run test",
+    "eslint": "eslint ."
+  },
   "repository": "hexojs/hexo-migrator-wordpress",
   "keywords": [
     "hexo",
@@ -16,5 +24,15 @@
     "request": "^2.36.0",
     "turndown": "^4.0.2",
     "xml2js": "0.4.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "eslint": "^6.1.0",
+    "eslint-config-hexo": "^3.0.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1"
+  },
+  "engines": {
+    "node": ">= 8.6.0"
   }
 }
