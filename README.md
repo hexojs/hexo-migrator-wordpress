@@ -1,4 +1,4 @@
-# WordPress migrator
+# hexo-migrator-wordpress
 
 Migrate your blog from WordPress to [Hexo].
 
