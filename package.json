@@ -23,7 +23,7 @@
     "async": "^3.1.0",
     "request": "^2.36.0",
     "turndown": "^5.0.3",
-    "xml2js": "0.4.2"
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "chai": "^4.2.0",
