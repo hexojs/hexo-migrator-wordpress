@@ -1,4 +1,4 @@
-# WordPress migrator
+# hexo-migrator-wordpress
 
 [![Build Status](https://travis-ci.org/hexojs/hexo-migrator-wordpress.svg?branch=master)](https://travis-ci.org/hexojs/hexo-migrator-wordpress)
 [![NPM version](https://badge.fury.io/js/hexo-migrator-wordpress.svg)](https://www.npmjs.com/package/hexo-migrator-wordpress)
