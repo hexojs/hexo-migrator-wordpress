@@ -5,7 +5,8 @@ cache:
 
 node_js:
   - "10"
-  - "node"
+  - "12"
+  - "13"
 
 script:
   - npm run eslint
