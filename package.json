@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "WordPress migrator plugin for Hexo",
   "main": "index.js",
+  "directories": {
+    "lib": "./lib"
+  },
   "files": [
-    "index.js"
+    "index.js",
+    "lib/"
   ],
   "scripts": {
     "test": "mocha test/index.js",
@@ -20,17 +24,20 @@
   "author": "Tommy Chen <tommy351@gmail.com> (http://zespia.tw)",
   "license": "MIT",
   "dependencies": {
-    "async": "^3.1.0",
-    "request": "^2.36.0",
-    "turndown": "^6.0.0",
-    "xml2js": "^0.4.19"
+    "camaro": "^6.0.2",
+    "hexo-fs": "^3.1.0",
+    "hexo-util": "^2.1.0",
+    "got": "^11.3.0",
+    "turndown": "^6.0.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^7.0.0",
     "eslint-config-hexo": "^4.0.0",
+    "hexo": "^4.2.0",
     "mocha": "^8.0.1",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "sinon": "^9.0.2"
   },
   "engines": {
     "node": ">= 12.13.0"
