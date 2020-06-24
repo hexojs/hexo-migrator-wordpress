@@ -52,7 +52,7 @@ describe('migrator', function() {
     log.w.calledWith('%d posts did not have titles and were prefixed with "Untitled Post".', 1).should.eql(true);
   });
 
-  it.skip('default - url', async () => {
+  it('default - url', async () => {
     await m({ _: ['https://github.com/hexojs/hexo-migrator-wordpress/raw/master/test/fixtures/wordpress.xml'] });
     const exist = await exists(join(hexo.source_dir, '_posts', 'dove-comprare-200-mg-celebrex.md'));
 
