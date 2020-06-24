@@ -32,6 +32,17 @@ describe('migrator', function() {
     exist.should.eql(true);
   });
 
+  it('default - should import all posts/pages', async () => {
+    const path = join(__dirname, 'fixtures/wordpress.xml');
+    await m({ _: [path] });
+
+    const files = await listDir(join(hexo.source_dir));
+    const feed = await readFile(path);
+    const expected = await parseFeed(feed);
+
+    files.length.should.eql(expected.items.length);
+  });
+
   it('default - logging', async () => {
     const path = join(__dirname, 'fixtures/wordpress.xml');
     await m({ _: [path] });
@@ -92,8 +103,24 @@ describe('migrator', function() {
     const path = join(__dirname, 'fixtures/wordpress.xml');
     const limit = 2;
     await m({ _: [path], limit });
+
     const posts = await listDir(join(hexo.source_dir, '_posts'));
     posts.length.should.eql(limit);
+  });
+
+  it('option - limit should not apply to page', async () => {
+    const path = join(__dirname, 'fixtures/wordpress.xml');
+    const limit = 3;
+    await m({ _: [path], limit });
+
+    const files = await listDir(join(hexo.source_dir));
+    const pages = files.filter(file => !file.startsWith('_posts'));
+
+    const feed = await readFile(path);
+    const expected = await parseFeed(feed);
+    const expectedPages = expected.items.filter(({ type }) => type === 'page');
+
+    pages.length.should.eql(expectedPages.length);
   });
 
   it('option - invalid limit', async () => {
