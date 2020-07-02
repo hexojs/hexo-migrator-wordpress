@@ -101,6 +101,42 @@ describe('migrator', function() {
     posts.includes(unescape(percentEncoded.slug) + '.md').should.eql(true);
   });
 
+  it('excerpt', async () => {
+    const content = 'foo<!-- more -->bar';
+    const xml = `<rss><channel><title>test</title>
+    <item><title>baz</title><content:encoded><![CDATA[${content}]]></content:encoded></item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const rendered = await readFile(join(hexo.source_dir, '_posts', 'baz.md'));
+    const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
+    const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+
+    output.should.eql(content);
+
+    await unlink(path);
+  });
+
+  it('excerpt - wp:more', async () => {
+    const content = 'foo<!-- wp:more --><!-- more --><!-- wp:more -->bar';
+    const xml = `<rss><channel><title>test</title>
+    <item><title>baz</title><content:encoded><![CDATA[${content}]]></content:encoded></item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const rendered = await readFile(join(hexo.source_dir, '_posts', 'baz.md'));
+    const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
+    const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+
+    output.should.eql(content.replace(/<!-- wp:more -->/g, ''));
+
+    await unlink(path);
+  });
+
   it('no argument', async () => {
     try {
       await m({ _: [''] });
