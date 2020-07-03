@@ -87,6 +87,20 @@ describe('migrator', function() {
     await unlink(path);
   });
 
+  // #12
+  it('decode percent-encoding in slug', async () => {
+    const { unescape } = require('querystring');
+    const path = join(__dirname, 'fixtures/wordpress.xml');
+    await m({ _: [path] });
+
+    const input = await readFile(path);
+    const { items } = await parseFeed(input);
+    const [percentEncoded] = items.filter(({ slug }) => slug.includes('%'));
+    const posts = await listDir(join(hexo.source_dir, '_posts'));
+
+    posts.includes(unescape(percentEncoded.slug) + '.md').should.eql(true);
+  });
+
   it('no argument', async () => {
     try {
       await m({ _: [''] });
