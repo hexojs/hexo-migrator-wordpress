@@ -3,7 +3,7 @@
 require('chai').should();
 const should = require('chai').should();
 const { join } = require('path');
-const { exists, listDir, readFile, rmdir, writeFile } = require('hexo-fs');
+const { exists, listDir, readFile, rmdir, unlink, writeFile } = require('hexo-fs');
 const Hexo = require('hexo');
 const hexo = new Hexo(process.cwd(), { silent: true });
 const m = require('../lib/migrator.js').bind(hexo);
@@ -68,6 +68,23 @@ describe('migrator', function() {
     const exist = await exists(join(hexo.source_dir, '_posts', 'dove-comprare-200-mg-celebrex.md'));
 
     exist.should.eql(true);
+  });
+
+  it('handle title with double quotes', async () => {
+    const { slugize } = require('hexo-util');
+
+    const title = 'lorem "ipsum"';
+    const xml = `<rss><channel><title>test</title>
+    <item><title>${title}</title><content:encoded><![CDATA[foobar]]></content:encoded></item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', slugize(title) + '.md'));
+    post.includes('title: ' + title).should.eql(true);
+
+    await unlink(path);
   });
 
   it('no argument', async () => {
