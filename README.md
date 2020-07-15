@@ -37,6 +37,7 @@ $ hexo migrate wordpress <source> [--options]
 - **import_image**: Download all image attachments from your Wordpress.
   * Downloaded images will be saved based on the original directories.
   * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
+  * Limited to JPEG, PNG, GIF and WebP images only.
   * Disabled by default.
 
 [Hexo]: http://hexo.io/
