@@ -137,10 +137,19 @@ describe('migrator', function() {
     await unlink(path);
   });
 
-  it('skip import attachment as post', async () => {
+  it('import image', async () => {
+    const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+    const imagePath = '2020/07/image.png';
     const xml = `<rss><channel><title>test</title>
-    <item><title>foo</title><wp:post_type>post</wp:post_type></item>
-    <item><title>image</title><wp:post_type>attachment</wp:post_type></item>
+    <item><title>image</title><wp:post_type>attachment</wp:post_type>
+    <wp:attachment_url>${imageUrl}</wp:attachment_url>
+    <wp:postmeta>
+    <wp:meta_key>_wp_attached_file</wp:meta_key><wp:meta_value>${imagePath}</wp:meta_value>
+    </wp:postmeta>
+    <wp:postmeta>
+    <wp:meta_key>bar</wp:meta_key><wp:meta_value>bar</wp:meta_value>
+    </wp:postmeta>
+    </item>
     </channel></rss>`;
     const path = join(__dirname, 'image.xml');
     await writeFile(path, xml);
@@ -148,6 +157,12 @@ describe('migrator', function() {
 
     const files = await listDir(join(hexo.source_dir));
     files.length.should.eql(1);
+
+    const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
+    const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
+
+    // PNG
+    header.should.eql('89504e470a1a0a');
 
     await unlink(path);
   });
