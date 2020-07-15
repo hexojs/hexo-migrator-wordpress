@@ -2,7 +2,8 @@
 
 require('chai').should();
 const should = require('chai').should();
-const { join } = require('path');
+const { basename, join } = require('path');
+const { parse: parseUrl } = require('url');
 const { exists, listDir, readFile, rmdir, unlink, writeFile } = require('hexo-fs');
 const Hexo = require('hexo');
 const hexo = new Hexo(process.cwd(), { silent: true });
@@ -137,34 +138,114 @@ describe('migrator', function() {
     await unlink(path);
   });
 
-  it('import image', async () => {
-    const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
-    const imagePath = '2020/07/image.png';
-    const xml = `<rss><channel><title>test</title>
-    <item><title>image</title><wp:post_type>attachment</wp:post_type>
-    <wp:attachment_url>${imageUrl}</wp:attachment_url>
-    <wp:postmeta>
-    <wp:meta_key>_wp_attached_file</wp:meta_key><wp:meta_value>${imagePath}</wp:meta_value>
-    </wp:postmeta>
-    <wp:postmeta>
-    <wp:meta_key>bar</wp:meta_key><wp:meta_value>bar</wp:meta_value>
-    </wp:postmeta>
-    </item>
-    </channel></rss>`;
-    const path = join(__dirname, 'image.xml');
-    await writeFile(path, xml);
-    await m({ _: [path] });
+  describe('import image', () => {
+    const title = 'image';
+    const wp = (imageUrl = '', imagePath = '') => {
+      return `<rss><channel><title>test</title>
+      <item><title>${title}</title><wp:post_type>attachment</wp:post_type>
+      <wp:attachment_url>${imageUrl}</wp:attachment_url>
+      <wp:postmeta>
+      <wp:meta_key>_wp_attached_file</wp:meta_key><wp:meta_value>${imagePath}</wp:meta_value>
+      </wp:postmeta>
+      <wp:postmeta>
+      <wp:meta_key>bar</wp:meta_key><wp:meta_value>bar</wp:meta_value>
+      </wp:postmeta>
+      </item>
+      </channel></rss>`;
+    };
 
-    const files = await listDir(join(hexo.source_dir));
-    files.length.should.eql(1);
+    it('import image', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+      const imagePath = '2020/07/image.png';
+      const xml = wp(imageUrl, imagePath);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
 
-    const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
-    const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
+      log.i.calledWith('Image found: %s', imagePath).should.eql(true);
 
-    // PNG
-    header.should.eql('89504e470a1a0a');
+      const files = await listDir(join(hexo.source_dir));
+      files.length.should.eql(1);
 
-    await unlink(path);
+      const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
+      const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
+
+      // PNG
+      header.should.eql('89504e470a1a0a');
+
+      await unlink(path);
+    });
+
+    it('import_image disabled', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+      const imagePath = '2020/07/image.png';
+      const xml = wp(imageUrl, imagePath);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path] });
+
+      const folderExist = await exists(join(hexo.source_dir));
+      folderExist.should.eql(false);
+
+      await unlink(path);
+    });
+
+    it('invalid xml', async () => {
+      const title = 'foo';
+      const xml = `<rss><channel><title>test</title>
+      <item><title>${title}</title><wp:post_type>attachment</wp:post_type></item>
+      </channel></rss>`;
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      log.w.calledWith('"%s" image not found.', title).should.eql(true);
+
+      await unlink(path);
+    });
+
+    it('no image link', async () => {
+      const xml = wp('');
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      log.w.calledWith('"%s" image not found.', title).should.eql(true);
+
+      await unlink(path);
+    });
+
+    it('no image path', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+      const filename = basename(parseUrl(imageUrl).pathname);
+      const xml = wp(imageUrl, '');
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      log.w.calledWith('Image found but without a valid path. Using %s', filename).should.eql(true);
+
+      const image = await readFile(join(hexo.source_dir, filename), { encoding: 'binary' });
+      const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
+
+      header.should.eql('89504e470a1a0a');
+
+      await unlink(path);
+    });
+
+    it('invalid image link', async () => {
+      const imageUrl = 'http://does.not.exist/';
+      const xml = wp(imageUrl, 'image.png');
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      const [[{ name: errMsg }]] = log.e.args;
+      errMsg.should.eql('RequestError');
+
+      await unlink(path);
+    });
+
   });
 
   it('no argument', async () => {

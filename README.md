@@ -34,5 +34,9 @@ $ hexo migrate wordpress <source> [--options]
   * If the input contains a post titled 'Foo Bar' and there is an existing post named 'Foo-Bar.md', then that post will not be migrated.
   * The comparison is case-insensitive; a post titled 'FOO BAR' will be skipped if 'foo-bar.md' exists.
   * Without this option (default), this plugin will continue to migrate that post and create a post named 'Foo-Bar-1.md'
+- **import_image**: Download all image attachments from your Wordpress.
+  * Downloaded images will be saved based on the original directories.
+  * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
+  * Disabled by default.
 
 [Hexo]: http://hexo.io/
