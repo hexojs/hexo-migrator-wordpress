@@ -137,6 +137,21 @@ describe('migrator', function() {
     await unlink(path);
   });
 
+  it('skip import attachment as post', async () => {
+    const xml = `<rss><channel><title>test</title>
+    <item><title>foo</title><wp:post_type>post</wp:post_type></item>
+    <item><title>image</title><wp:post_type>attachment</wp:post_type></item>
+    </channel></rss>`;
+    const path = join(__dirname, 'image.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const files = await listDir(join(hexo.source_dir));
+    files.length.should.eql(1);
+
+    await unlink(path);
+  });
+
   it('no argument', async () => {
     try {
       await m({ _: [''] });
