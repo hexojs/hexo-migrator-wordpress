@@ -246,6 +246,18 @@ describe('migrator', function() {
       await unlink(path);
     });
 
+    it('non-image', async () => {
+      const imageUrl = 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js';
+      const xml = wp(imageUrl, 'image.png');
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      const folderExist = await exists(join(hexo.source_dir));
+      folderExist.should.eql(false);
+
+      await unlink(path);
+    });
   });
 
   it('no argument', async () => {
