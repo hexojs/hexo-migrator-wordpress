@@ -11,9 +11,15 @@ const m = require('../lib/migrator.js').bind(hexo);
 const parseFeed = require('../lib/feed');
 const { spy } = require('sinon');
 const log = spy(hexo.log);
+const TurndownService = require('turndown');
+const tomd = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
 
 const filterPost = ({ type }) => {
   return type === 'post';
+};
+
+const md = str => {
+  return tomd.turndown(str);
 };
 
 describe('migrator', function() {
@@ -139,9 +145,12 @@ describe('migrator', function() {
   });
 
   describe('import image', () => {
+    const postTitle = 'foo';
     const title = 'image';
-    const wp = (imageUrl = '', imagePath = '') => {
+    const wp = (imageUrl = '', imagePath = '', content = '') => {
       return `<rss><channel><title>test</title>
+      <item><title>${postTitle}</title><wp:post_type>post</wp:post_type>
+      <content:encoded><![CDATA[${content}]]></content:encoded></item>
       <item><title>${title}</title><wp:post_type>attachment</wp:post_type>
       <wp:attachment_url>${imageUrl}</wp:attachment_url>
       <wp:postmeta>
@@ -157,21 +166,26 @@ describe('migrator', function() {
     it('import image', async () => {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
       const imagePath = '2020/07/image.png';
-      const xml = wp(imageUrl, imagePath);
+      const imgEmbed = `<img src="${imageUrl}" alt="${imageUrl}" />`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
       await m({ _: [path], import_image: true });
 
       log.i.calledWith('Image found: %s', imagePath).should.eql(true);
 
-      const files = await listDir(join(hexo.source_dir));
-      files.length.should.eql(1);
-
       const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
       const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
 
       // PNG
       header.should.eql('89504e470a1a0a');
+
+      // original link should be replaced with local image
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
+      const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+
+      output.should.eql(md(imgEmbed).replace(imageUrl + ')', '/' + imagePath + ')'));
 
       await unlink(path);
     });
@@ -184,8 +198,8 @@ describe('migrator', function() {
       await writeFile(path, xml);
       await m({ _: [path] });
 
-      const folderExist = await exists(join(hexo.source_dir));
-      folderExist.should.eql(false);
+      const imgExist = await exists(join(hexo.source_dir, imagePath));
+      imgExist.should.eql(false);
 
       await unlink(path);
     });
@@ -248,13 +262,14 @@ describe('migrator', function() {
 
     it('non-image', async () => {
       const imageUrl = 'https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js';
+      const imagePath = '2020/07/image.png';
       const xml = wp(imageUrl, 'image.png');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
       await m({ _: [path], import_image: true });
 
-      const folderExist = await exists(join(hexo.source_dir));
-      folderExist.should.eql(false);
+      const imageExist = await exists(join(hexo.source_dir, imagePath));
+      imageExist.should.eql(false);
 
       await unlink(path);
     });
