@@ -24,6 +24,13 @@ const md = str => {
   return tomd.turndown(str);
 };
 
+// Extract a post's content excluding front-matter
+// https://github.com/hexojs/hexo-front-matter
+const parsePost = post => {
+  const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
+  return post.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+};
+
 describe('migrator', function() {
   this.timeout(5000);
 
@@ -120,8 +127,7 @@ describe('migrator', function() {
     await m({ _: [path] });
 
     const rendered = await readFile(join(hexo.source_dir, '_posts', 'baz.md'));
-    const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
-    const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+    const output = parsePost(rendered);
 
     output.should.eql(content);
 
@@ -138,8 +144,7 @@ describe('migrator', function() {
     await m({ _: [path] });
 
     const rendered = await readFile(join(hexo.source_dir, '_posts', 'baz.md'));
-    const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
-    const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+    const output = parsePost(rendered);
 
     output.should.eql(content.replace(/<!-- wp:more -->/g, ''));
 
@@ -186,8 +191,7 @@ describe('migrator', function() {
 
       // original link should be replaced with local image
       const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
-      const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
-      const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+      const output = parsePost(rendered);
 
       output.should.eql(md(imgEmbed).replace(imageUrl + ')', '/' + imagePath + ')'));
 
@@ -210,8 +214,7 @@ describe('migrator', function() {
 
       // original link should be replaced with local image
       const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
-      const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
-      const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+      const output = parsePost(rendered);
 
       output.should.eql(md(imgEmbed).replace(imageUrl + ')', imageFile + ')'));
 
