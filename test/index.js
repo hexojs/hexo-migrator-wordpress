@@ -13,6 +13,8 @@ const { spy } = require('sinon');
 const log = spy(hexo.log);
 const TurndownService = require('turndown');
 const tomd = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
+const { deepMerge, slugize } = require('hexo-util');
+const defaultCfg = deepMerge({}, hexo.config);
 
 const filterPost = ({ type }) => {
   return type === 'post';
@@ -26,6 +28,8 @@ describe('migrator', function() {
   this.timeout(5000);
 
   before(() => hexo.init());
+
+  beforeEach(() => { hexo.config = deepMerge({}, defaultCfg); });
 
   afterEach(async () => {
     const exist = await exists(hexo.source_dir);
@@ -78,8 +82,6 @@ describe('migrator', function() {
   });
 
   it('handle title with double quotes', async () => {
-    const { slugize } = require('hexo-util');
-
     const title = 'lorem "ipsum"';
     const xml = `<rss><channel><title>test</title>
     <item><title>${title}</title><content:encoded><![CDATA[foobar]]></content:encoded></item>
@@ -146,12 +148,14 @@ describe('migrator', function() {
 
   describe('import image', () => {
     const postTitle = 'foo';
-    const title = 'image';
+    const imgTitle = 'image';
     const wp = (imageUrl = '', imagePath = '', content = '') => {
       return `<rss><channel><title>test</title>
       <item><title>${postTitle}</title><wp:post_type>post</wp:post_type>
       <content:encoded><![CDATA[${content}]]></content:encoded></item>
-      <item><title>${title}</title><wp:post_type>attachment</wp:post_type>
+      <item><title>${imgTitle}</title>
+      <link>http://localhost/wp/2020/07/07/${postTitle}/${imgTitle}/</link>
+      <wp:post_type>attachment</wp:post_type>
       <wp:attachment_url>${imageUrl}</wp:attachment_url>
       <wp:postmeta>
       <wp:meta_key>_wp_attached_file</wp:meta_key><wp:meta_value>${imagePath}</wp:meta_value>
@@ -190,6 +194,30 @@ describe('migrator', function() {
       await unlink(path);
     });
 
+    it('import image - post_asset_folder', async () => {
+      hexo.config.post_asset_folder = true;
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+      const imagePath = '2020/07/image.png';
+      const imageFile = basename(imagePath);
+      const imgEmbed = `<img src="${imageUrl}" alt="${imageUrl}" />`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      const imgExist = await exists(join(hexo.source_dir, '_posts', postTitle, imageFile));
+      imgExist.should.eql(true);
+
+      // original link should be replaced with local image
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
+      const output = rendered.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+
+      output.should.eql(md(imgEmbed).replace(imageUrl + ')', imageFile + ')'));
+
+      await unlink(path);
+    });
+
     it('import_image disabled', async () => {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
       const imagePath = '2020/07/image.png';
@@ -224,7 +252,7 @@ describe('migrator', function() {
       await writeFile(path, xml);
       await m({ _: [path], import_image: true });
 
-      log.w.calledWith('"%s" image not found.', title).should.eql(true);
+      log.w.calledWith('"%s" image not found.', imgTitle).should.eql(true);
 
       await unlink(path);
     });
