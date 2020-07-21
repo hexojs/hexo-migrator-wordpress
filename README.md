@@ -36,9 +36,14 @@ $ hexo migrate wordpress <source> [--options]
   * Without this option (default), this plugin will continue to migrate that post and create a post named 'Foo-Bar-1.md'
 - **import_image**: Download all image attachments from your Wordpress.
   * Downloaded images will be saved based on the original directories.
-    * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
-  * Image embed link is automatically replaced with new path.
-    * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](/2020/07/image.jpg)
+    * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `source/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
+    * Image embed link will be automatically replaced with a new path.
+      * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](/2020/07/image.jpg)`
+  * If [`post_asset_folder`](https://hexo.io/docs/asset-folders#Post-Asset-Folder) is enabled, images will be saved according to their associated post.
+      * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` is associated with `http://yourwordpress.com/2020/07/04/foo-post/` post.
+      * `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `source/_posts/foo-post/image.jpg` => `http://yourhexo.com/2020/07/04/foo-post/image.jpg`.
+    * Image embed link will be automatically replaced with a new path.
+      * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](image.jpg)`
   * Limited to JPEG, PNG, GIF and WebP images only.
   * Disabled by default.
 
