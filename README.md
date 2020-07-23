@@ -34,7 +34,7 @@ $ hexo migrate wordpress <source> [--options]
   * If the input contains a post titled 'Foo Bar' and there is an existing post named 'Foo-Bar.md', then that post will not be migrated.
   * The comparison is case-insensitive; a post titled 'FOO BAR' will be skipped if 'foo-bar.md' exists.
   * Without this option (default), this plugin will continue to migrate that post and create a post named 'Foo-Bar-1.md'
-- **import_image**: Download all image attachments from your Wordpress.
+- **import_image**: Download all original and resized image attachments from your Wordpress.
   * Downloaded images will be saved based on the original directories.
     * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `source/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
     * Image embed link will be automatically replaced with a new path.
@@ -45,6 +45,14 @@ $ hexo migrate wordpress <source> [--options]
     * Image embed link will be automatically replaced with a new path.
       * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](image.jpg)`
   * Limited to JPEG, PNG, GIF and WebP images only.
+  * This also applies to resized images.
+    * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image-500x300.jpg` => `source/2020/07/image-500x300.jpg` => `http://yourhexo.com/2020/07/image-500x300.jpg`.
+    * Compatible with `post_asset_folder`: `http://yourwordpress.com/wp-content/uploads/2020/07/image-500x300.jpg` => `source/_posts/foo-post/image-500x300.jpg` => `http://yourhexo.com/2020/07/04/foo-post/image-500x300.jpg`.
+  * Usage: `$ hexo migrate wordpress /path/export.xml --import_image`
+  * **original**: Download original image attachments only.
+    * Resized image embed will be replaced with original-sized image.
+    * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image-500x300.jpg` => `source/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
+    * Usage: `$ hexo migrate wordpress /path/export.xml --import_image original`
 - **paragraph-fix**: If you used Wordpress [classic editor](https://wordpress.org/plugins/classic-editor/) to write posts, you may find imported posts do not have the original paragraphs. Use this option to restore the paragraphs.
 
 [Hexo]: http://hexo.io/
