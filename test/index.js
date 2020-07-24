@@ -28,8 +28,8 @@ const md = str => {
 // Extract a post's content excluding front-matter
 // https://github.com/hexojs/hexo-front-matter
 const parsePost = (post, newline = false) => {
-  const { _content: content } = post;
-  if (newline === false) content.replace(/\r?\n|\r/g, '');
+  const { _content: content } = fm(post);
+  if (newline === false) return content.replace(/\r?\n/g, '');
   return content.trim();
 };
 
@@ -185,12 +185,30 @@ describe('migrator', function() {
     </channel></rss>`;
     const path = join(__dirname, 'excerpt.xml');
     await writeFile(path, xml);
-    await m({ _: [path] });
+    await m({ _: [path], 'paragraph-fix': true });
 
     const rendered = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
     const output = parsePost(rendered, true);
 
     output.should.eql(content);
+
+    await unlink(path);
+  });
+
+  it('retain paragraph - disable', async () => {
+    const title = 'baz';
+    const content = 'lorem\n\nipsum\n\ndolor';
+    const xml = `<rss><channel><title>test</title>
+    <item><title>${title}</title><content:encoded><![CDATA[${content}]]></content:encoded></item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const rendered = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const output = parsePost(rendered);
+
+    output.should.eql(content.replace(/\n{2}/g, ' '));
 
     await unlink(path);
   });

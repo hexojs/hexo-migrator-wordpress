@@ -45,6 +45,6 @@ $ hexo migrate wordpress <source> [--options]
     * Image embed link will be automatically replaced with a new path.
       * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](image.jpg)`
   * Limited to JPEG, PNG, GIF and WebP images only.
-  * Disabled by default.
+- **paragraph-fix**: If you used Wordpress [classic editor](https://wordpress.org/plugins/classic-editor/) to write posts, you may find imported posts do not have the original paragraphs. Use this option to restore the paragraphs.
 
 [Hexo]: http://hexo.io/
