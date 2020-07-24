@@ -13,7 +13,7 @@ const { spy } = require('sinon');
 const log = spy(hexo.log);
 const TurndownService = require('turndown');
 const tomd = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
-const { deepMerge, slugize } = require('hexo-util');
+const { deepMerge, escapeHTML, slugize } = require('hexo-util');
 const { parse: fm } = require('hexo-front-matter');
 const defaultCfg = deepMerge({}, hexo.config);
 
@@ -56,7 +56,7 @@ describe('migrator', function() {
     const path = join(__dirname, 'fixtures/wordpress.xml');
     await m({ _: [path] });
 
-    const files = await listDir(join(hexo.source_dir));
+    const files = await listDir(hexo.source_dir);
     const feed = await readFile(path);
     const expected = await parseFeed(feed);
 
@@ -96,6 +96,25 @@ describe('migrator', function() {
     <item><title>${title}</title><content:encoded><![CDATA[foobar]]></content:encoded></item>
     </channel></rss>`;
     const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', slugize(title) + '.md'));
+    post.includes('title: ' + title).should.eql(true);
+
+    await unlink(path);
+  });
+
+  // #76
+  it('handle title with escaped character', async () => {
+    const title = 'lorem & "ipsum"';
+    const xml = `<rss><channel><title>test</title>
+    <item><title><![CDATA[${escapeHTML(title)}]]></title>
+    <content:encoded><![CDATA[foo]]></content:encoded>
+    <wp:post_name><![CDATA[${slugize(title)}]]></wp:post_name>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'post.xml');
     await writeFile(path, xml);
     await m({ _: [path] });
 
