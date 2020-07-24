@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "test": "mocha test/index.js",
-    "test-cov": "nyc npm run test",
+    "test-cov": "nyc --reporter=lcovonly npm run test",
     "eslint": "eslint ."
   },
   "repository": "hexojs/hexo-migrator-wordpress",
