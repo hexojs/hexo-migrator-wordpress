@@ -14,6 +14,7 @@ const log = spy(hexo.log);
 const TurndownService = require('turndown');
 const tomd = new TurndownService({ headingStyle: 'atx', codeBlockStyle: 'fenced' });
 const { deepMerge, slugize } = require('hexo-util');
+const { parse: fm } = require('hexo-front-matter');
 const defaultCfg = deepMerge({}, hexo.config);
 
 const filterPost = ({ type }) => {
@@ -27,8 +28,7 @@ const md = str => {
 // Extract a post's content excluding front-matter
 // https://github.com/hexojs/hexo-front-matter
 const parsePost = post => {
-  const rFrontMatter = /^([\s\S]+?)\n(-{3,}|;{3,})(?:$|\n([\s\S]*)$)/;
-  return post.match(rFrontMatter)[3].replace(/\r?\n|\r/g, '');
+  return fm(post)._content.replace(/\r?\n|\r/g, '');
 };
 
 describe('migrator', function() {
@@ -115,6 +115,30 @@ describe('migrator', function() {
     const posts = await listDir(join(hexo.source_dir, '_posts'));
 
     posts.includes(unescape(percentEncoded.slug) + '.md').should.eql(true);
+  });
+
+  it('tags', async () => {
+    const title = 'foo';
+    const postTags = ['lorem', 'ipsum', 'dolor'];
+    const [lorem, ipsum, dolor] = postTags;
+    const xml = `<rss><channel><title>test</title>
+    <item><title>${title}</title><content:encoded><![CDATA[foobar]]></content:encoded>
+    <category domain="category" nicename="uncategorized"><![CDATA[Uncategorized]]></category>
+    <category domain="post_tag" nicename="${lorem}"><![CDATA[${lorem}]]></category>
+    <category domain="post_tag" nicename="${ipsum}"><![CDATA[${ipsum}]]></category>
+    <category domain="post_tag" nicename="${dolor}"><![CDATA[${dolor}]]></category>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const { tags } = fm(post);
+
+    tags.should.have.members(postTags);
+
+    await unlink(path);
   });
 
   it('excerpt', async () => {
