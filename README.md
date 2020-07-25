@@ -15,7 +15,7 @@ $ npm install hexo-migrator-wordpress --save
 
 ## Usage
 
-Export your WordPress in "Tools" → "Export" → "WordPress" in your dashboard.
+Export your WordPress in "Tools" → "Export" → "All Content" in your dashboard.
 
 Execute the following command after installed. `source` is the file path or URL of WordPress export file.
 
