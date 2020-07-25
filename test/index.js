@@ -183,6 +183,11 @@ describe('migrator', function() {
 
       log.i.calledWith('Image found: %s', imagePath).should.eql(true);
 
+      const { items } = await parseFeed(xml);
+      const imgNum = items.filter(({type}) => type === 'attachment').length;
+      const { lastCall } = log.i;
+      lastCall.calledWith('%d images migrated.', imgNum).should.eql(true);
+
       const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
       const header = Buffer.from(image, 'binary').toString('hex').substring(0, 14);
 
