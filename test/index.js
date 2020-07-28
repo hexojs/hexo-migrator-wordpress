@@ -343,7 +343,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       log.i.calledWith('Image found: %s', imagePath).should.eql(true);
 
@@ -376,7 +376,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       // Original size
       const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
@@ -407,7 +407,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: 'original' });
+      await m({ _: [path], 'import-image': 'original' });
 
       const resizePath = join(dirname(imagePath), basename(resizeImg));
       const fileExist = await exists(join(hexo.source_dir, resizePath));
@@ -430,7 +430,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       const imgExist = await exists(join(hexo.source_dir, '_posts', postTitle, imageFile));
       imgExist.should.eql(true);
@@ -454,7 +454,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       const imgExist = await exists(join(hexo.source_dir, '_posts', postTitle, imageFile));
       imgExist.should.eql(true);
@@ -489,7 +489,7 @@ describe('migrator', function() {
       </channel></rss>`;
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       log.w.calledWith('"%s" image not found.', title).should.eql(true);
 
@@ -500,7 +500,7 @@ describe('migrator', function() {
       const xml = wp('');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       log.w.calledWith('"%s" image not found.', imgTitle).should.eql(true);
 
@@ -513,7 +513,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, '');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       log.w.calledWith('Image found but without a valid path. Using %s', filename).should.eql(true);
 
@@ -530,7 +530,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, 'image.png');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       const [[{ name: errMsg }]] = log.e.args;
       errMsg.should.eql('RequestError');
@@ -544,7 +544,7 @@ describe('migrator', function() {
       const xml = wp(imageUrl, 'image.png');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
-      await m({ _: [path], import_image: true });
+      await m({ _: [path], 'import-image': true });
 
       const imageExist = await exists(join(hexo.source_dir, imagePath));
       imageExist.should.eql(false);
