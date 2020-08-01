@@ -143,6 +143,108 @@ describe('migrator', function() {
     await unlink(path);
   });
 
+  it('nested categories - two-level', async () => {
+    const title = 'foo';
+    const postCats = ['lorem', 'ipsum', 'dolor'];
+    const [lorem, ipsum, dolor] = postCats;
+    const xml = `<rss><channel><title>test</title>
+    <wp:category>
+		<wp:cat_name>${ipsum}</wp:cat_name>
+		<wp:category_parent>${lorem}</wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${lorem}</wp:cat_name>
+		<wp:category_parent></wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${dolor}</wp:cat_name>
+		<wp:category_parent></wp:category_parent>
+	  </wp:category>
+    <item><title>${title}</title><content:encoded>foobar</content:encoded>
+    <category domain="category">${lorem}</category>
+    <category domain="category">${ipsum}</category>
+    <category domain="category">${dolor}</category>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const { categories } = fm(post);
+    categories.should.have.deep.members([['lorem', 'ipsum'], ['dolor']]);
+
+    await unlink(path);
+  });
+
+  it('nested categories - three-level', async () => {
+    const title = 'foo';
+    const postCats = ['lorem', 'ipsum', 'dolor', 'foo', 'bar'];
+    const [lorem, ipsum, dolor, foo, bar] = postCats;
+    const xml = `<rss><channel><title>test</title>
+    <wp:category>
+		<wp:cat_name>${dolor}</wp:cat_name>
+		<wp:category_parent>${ipsum}</wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${ipsum}</wp:cat_name>
+		<wp:category_parent>${lorem}</wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${lorem}</wp:cat_name>
+		<wp:category_parent></wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${bar}</wp:cat_name>
+		<wp:category_parent>${foo}</wp:category_parent>
+	  </wp:category>
+    <wp:category>
+		<wp:cat_name>${foo}</wp:cat_name>
+		<wp:category_parent></wp:category_parent>
+	  </wp:category>
+    <item><title>${title}</title><content:encoded>foobar</content:encoded>
+    <category domain="category">${lorem}</category>
+    <category domain="category">${ipsum}</category>
+    <category domain="category">${dolor}</category>
+    <category domain="category">${foo}</category>
+    <category domain="category">${bar}</category>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const { categories } = fm(post);
+    categories.should.have.deep.members([['lorem', 'ipsum', 'dolor'], ['foo', 'bar']]);
+
+    await unlink(path);
+  });
+
+  // #36
+  it('non-nested categories', async () => {
+    const title = 'foo';
+    const postCats = ['lorem', 'ipsum', 'dolor'];
+    const postCatsArray = postCats.map(cat => [cat]);
+    const [lorem, ipsum, dolor] = postCats;
+    const xml = `<rss><channel><title>test</title>
+    <item><title>${title}</title><content:encoded>foobar</content:encoded>
+    <category domain="category">${lorem}</category>
+    <category domain="category">${ipsum}</category>
+    <category domain="category">${dolor}</category>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const { categories } = fm(post);
+    categories.should.have.deep.members(postCatsArray);
+
+    await unlink(path);
+  });
+
   it('excerpt', async () => {
     const content = 'foo<!-- more -->bar';
     const xml = `<rss><channel><title>test</title>
