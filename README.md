@@ -54,5 +54,12 @@ $ hexo migrate wordpress <source> [--options]
     * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image-500x300.jpg` => `source/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
     * Usage: `$ hexo migrate wordpress /path/export.xml --import_image original`
 - **paragraph-fix**: If you used Wordpress [classic editor](https://wordpress.org/plugins/classic-editor/) to write posts, you may find imported posts do not have the original paragraphs. Use this option to restore the paragraphs.
+- **default-category**: Set a default category for posts without any category.
+  * Usage: `$ hexo migrate wordpress /path/export.xml --default-category 'unknown'`
+  * Defaults to the value set in user configuration:
+  ``` yml
+  # _config.yml
+  default_category: uncategorized
+  ```
 
 [Hexo]: http://hexo.io/
