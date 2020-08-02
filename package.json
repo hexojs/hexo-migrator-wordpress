@@ -1,6 +1,6 @@
 {
   "name": "hexo-migrator-wordpress",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "WordPress migrator plugin for Hexo",
   "main": "index.js",
   "directories": {
@@ -41,6 +41,6 @@
     "sinon": "^9.0.2"
   },
   "engines": {
-    "node": ">= 12.13.0"
+    "node": ">=12.13.0 <13 || >=14"
   }
 }
