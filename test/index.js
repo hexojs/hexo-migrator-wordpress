@@ -371,7 +371,7 @@ describe('migrator', function() {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
       const imagePath = '2020/07/hexo.jpg';
       const resizeImg = dirname(imageUrl) + '/' + basename(imageUrl, extname(imageUrl)) + '-100x90' + extname(imageUrl);
-      const resizePath = join(dirname(imagePath), basename(resizeImg));
+      const resizePath = dirname(imagePath) + '/' + basename(resizeImg);
       const imgEmbed = `<img src="${resizeImg}" alt="${imageUrl}" />`;
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
