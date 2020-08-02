@@ -1,6 +1,6 @@
 # hexo-migrator-wordpress
 
-[![Build Status](https://travis-ci.org/hexojs/hexo-migrator-wordpress.svg?branch=master)](https://travis-ci.org/hexojs/hexo-migrator-wordpress)
+[![Build Status](https://github.com/hexojs/hexo-migrator-wordpress/workflows/Tester/badge.svg)](https://github.com/hexojs/hexo-migrator-wordpress/actions?query=workflow%3ATester)
 [![NPM version](https://badge.fury.io/js/hexo-migrator-wordpress.svg)](https://www.npmjs.com/package/hexo-migrator-wordpress)
 
 Migrate your blog from WordPress to [Hexo].
