@@ -2,7 +2,7 @@
 
 require('chai').should();
 const should = require('chai').should();
-const { basename, join } = require('path');
+const { basename, dirname, extname, join } = require('path');
 const { parse: parseUrl } = require('url');
 const { exists, listDir, readFile, rmdir, unlink, writeFile } = require('hexo-fs');
 const Hexo = require('hexo');
@@ -336,9 +336,9 @@ describe('migrator', function() {
       </channel></rss>`;
     };
 
-    it('import image', async () => {
-      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
-      const imagePath = '2020/07/image.png';
+    it('default', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
+      const imagePath = '2020/07/hexo.png';
       const imgEmbed = `<img src="${imageUrl}" alt="${imageUrl}" />`;
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
@@ -367,10 +367,64 @@ describe('migrator', function() {
       await unlink(path);
     });
 
-    it('import image - post_asset_folder', async () => {
+    it('resized image', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
+      const imagePath = '2020/07/hexo.jpg';
+      const resizeImg = dirname(imageUrl) + '/' + basename(imageUrl, extname(imageUrl)) + '-100x90' + extname(imageUrl);
+      const resizePath = dirname(imagePath) + '/' + basename(resizeImg);
+      const imgEmbed = `<img src="${resizeImg}" alt="${imageUrl}" />`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      // Original size
+      const image = await readFile(join(hexo.source_dir, imagePath), { encoding: 'binary' });
+      const header = Buffer.from(image, 'binary').toString('hex').substring(0, 6);
+
+      // JPEG
+      header.should.eql('ffd8ff');
+
+      // Resized
+      const tinyImg = await readFile(join(hexo.source_dir, resizePath), { encoding: 'binary' });
+      const tinyHeader = Buffer.from(tinyImg, 'binary').toString('hex').substring(0, 6);
+      tinyHeader.should.eql('ffd8ff');
+
+      // original link should be replaced with local resized image
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const output = parsePost(rendered);
+
+      output.should.eql(md(imgEmbed).replace(resizeImg + ')', '/' + resizePath + ')'));
+
+      await unlink(path);
+    });
+
+    it('resized image - original only', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
+      const imagePath = '2020/07/hexo.jpg';
+      const resizeImg = dirname(imageUrl) + '/' + basename(imageUrl, extname(imageUrl)) + '-100x90' + extname(imageUrl);
+      const imgEmbed = `<img src="${resizeImg}" alt="${imageUrl}" />`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: 'original' });
+
+      const resizePath = join(dirname(imagePath), basename(resizeImg));
+      const fileExist = await exists(join(hexo.source_dir, resizePath));
+      fileExist.should.eql(false);
+
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const output = parsePost(rendered);
+
+      output.should.eql(md(imgEmbed).replace(resizeImg + ')', '/' + imagePath + ')'));
+
+      await unlink(path);
+    });
+
+    it('post_asset_folder', async () => {
       hexo.config.post_asset_folder = true;
-      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
-      const imagePath = '2020/07/image.png';
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
+      const imagePath = '2020/07/hexo.png';
       const imageFile = basename(imagePath);
       const imgEmbed = `<img src="${imageUrl}" alt="${imageUrl}" />`;
       const xml = wp(imageUrl, imagePath, imgEmbed);
@@ -390,8 +444,32 @@ describe('migrator', function() {
       await unlink(path);
     });
 
-    it('import_image disabled', async () => {
-      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+    it('post_asset_folder - resized image', async () => {
+      hexo.config.post_asset_folder = true;
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
+      const imagePath = '2020/07/hexo.jpg';
+      const resizeImg = dirname(imageUrl) + '/' + basename(imageUrl, extname(imageUrl)) + '-100x90' + extname(imageUrl);
+      const imageFile = basename(resizeImg);
+      const imgEmbed = `<img src="${resizeImg}" alt="${imageUrl}" />`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], import_image: true });
+
+      const imgExist = await exists(join(hexo.source_dir, '_posts', postTitle, imageFile));
+      imgExist.should.eql(true);
+
+      // original link should be replaced with local image
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const output = parsePost(rendered);
+
+      output.should.eql(md(imgEmbed).replace(resizeImg + ')', imageFile + ')'));
+
+      await unlink(path);
+    });
+
+    it('disabled', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
       const imagePath = '2020/07/image.png';
       const xml = wp(imageUrl, imagePath);
       const path = join(__dirname, 'image.xml');
@@ -430,7 +508,7 @@ describe('migrator', function() {
     });
 
     it('no image path', async () => {
-      const imageUrl = 'https://raw.githubusercontent.com/hexojs/logo/master/hexo-logo-avatar.png';
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
       const filename = basename(parseUrl(imageUrl).pathname);
       const xml = wp(imageUrl, '');
       const path = join(__dirname, 'image.xml');
