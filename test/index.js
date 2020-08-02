@@ -100,7 +100,8 @@ describe('migrator', function() {
     await m({ _: [path] });
 
     const post = await readFile(join(hexo.source_dir, '_posts', slugize(title) + '.md'));
-    post.includes('title: ' + title).should.eql(true);
+    const { title: postTitle } = fm(post);
+    postTitle.should.eql(title);
 
     await unlink(path);
   });
@@ -119,7 +120,8 @@ describe('migrator', function() {
     await m({ _: [path] });
 
     const post = await readFile(join(hexo.source_dir, '_posts', slugize(title) + '.md'));
-    post.includes('title: ' + title).should.eql(true);
+    const { title: postTitle } = fm(post);
+    postTitle.should.eql(title);
 
     await unlink(path);
   });
