@@ -2,7 +2,7 @@
 
 require('chai').should();
 const should = require('chai').should();
-const { basename, dirname, extname, join } = require('path');
+const { basename, dirname, extname, join } = require('path').posix;
 const { parse: parseUrl } = require('url');
 const { exists, listDir, readFile, rmdir, unlink, writeFile } = require('hexo-fs');
 const Hexo = require('hexo');
@@ -475,7 +475,7 @@ describe('migrator', function() {
       const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
       const output = parsePost(rendered);
 
-      output.should.eql(md(imgEmbed).replace(imageUrl + ')', '/' + imagePath + ')'));
+      output.should.eql(md(imgEmbed).replace(imageUrl + ')', join('/', imagePath) + ')'));
 
       await unlink(path);
     });
@@ -501,7 +501,7 @@ describe('migrator', function() {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
       const imagePath = '2020/07/hexo.jpg';
       const resizeImg = dirname(imageUrl) + '/' + basename(imageUrl, extname(imageUrl)) + '-100x90' + extname(imageUrl);
-      const resizePath = dirname(imagePath) + '/' + basename(resizeImg);
+      const resizePath = join(dirname(imagePath), basename(resizeImg));
       const imgEmbed = `<img src="${resizeImg}" alt="${imageUrl}" />`;
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
@@ -524,7 +524,7 @@ describe('migrator', function() {
       const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
       const output = parsePost(rendered);
 
-      output.should.eql(md(imgEmbed).replace(resizeImg + ')', '/' + resizePath + ')'));
+      output.should.eql(md(imgEmbed).replace(resizeImg + ')', join('/', resizePath) + ')'));
 
       await unlink(path);
     });
@@ -546,7 +546,7 @@ describe('migrator', function() {
       const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
       const output = parsePost(rendered);
 
-      output.should.eql(md(imgEmbed).replace(resizeImg + ')', '/' + imagePath + ')'));
+      output.should.eql(md(imgEmbed).replace(resizeImg + ')', join('/', imagePath) + ')'));
 
       await unlink(path);
     });
