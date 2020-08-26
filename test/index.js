@@ -480,6 +480,23 @@ describe('migrator', function() {
       await unlink(path);
     });
 
+    it('should avoid non-post assets', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
+      const imagePath = '2020/07/hexo.png';
+      const imgEmbed = `<p><img src="${imageUrl}" alt="${imageUrl}" /></p><p><img src="http://foo.com/bar.jpg" /></p>`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], 'import-image': true });
+
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const output = parsePost(rendered, true);
+
+      output.should.eql(md(imgEmbed).replace(imageUrl + ')', '/' + imagePath + ')'));
+
+      await unlink(path);
+    });
+
     it('resized image', async () => {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.jpg';
       const imagePath = '2020/07/hexo.jpg';
