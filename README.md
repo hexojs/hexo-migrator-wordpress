@@ -39,11 +39,12 @@ $ hexo migrate wordpress <source> [--options]
     * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `source/2020/07/image.jpg` => `http://yourhexo.com/2020/07/image.jpg`.
     * Image embed link will be automatically replaced with a new path.
       * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](/2020/07/image.jpg)`
-  * If [`post_asset_folder`](https://hexo.io/docs/asset-folders#Post-Asset-Folder) is enabled, images will be saved according to their associated post.
+  * If [`post_asset_folder`](https://hexo.io/docs/asset-folders#Post-Asset-Folder) is enabled before migration, images will be saved according to their associated post.
       * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` is associated with `http://yourwordpress.com/2020/07/04/foo-post/` post.
       * `http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg` => `source/_posts/foo-post/image.jpg` => `http://yourhexo.com/2020/07/04/foo-post/image.jpg`.
     * Image embed link will be automatically replaced with a new path.
       * Example: `![title](http://yourwordpress.com/wp-content/uploads/2020/07/image.jpg)` => `![title](image.jpg)`
+    * Note that the images are only valid when viewing individual post, not in index page. If you prefer to have them viewable on the index page too and you are using hexo-renderer-marked 3.1.0+, enables the [`postAsset:`](https://github.com/hexojs/hexo-renderer-marked#options) option.
   * Limited to JPEG, PNG, GIF and WebP images only.
   * This also applies to resized images.
     * Example: `http://yourwordpress.com/wp-content/uploads/2020/07/image-500x300.jpg` => `source/2020/07/image-500x300.jpg` => `http://yourhexo.com/2020/07/image-500x300.jpg`.
