@@ -788,4 +788,22 @@ describe('migrator', function() {
     posts.length.should.not.eql(expectedPosts.length);
     (posts.length > expectedPosts.length).should.eql(true);
   });
+
+  // #105
+  it('sanitize input', async () => {
+    const title = 'lorem';
+    const xml = `<rss><channel><title>test</title>
+    <item><title>${title}</title><content:encoded>foo\x00\x11bar</content:encoded>
+    </item>
+    </channel></rss>`;
+    const path = join(__dirname, 'excerpt.xml');
+    await writeFile(path, xml);
+    await m({ _: [path] });
+
+    const post = await readFile(join(hexo.source_dir, '_posts', title + '.md'));
+    const { _content: content } = fm(post);
+    content.trim().should.eql('foobar');
+
+    await unlink(path);
+  });
 });
