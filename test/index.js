@@ -430,13 +430,15 @@ describe('migrator', function() {
 
   describe('import image', () => {
     const postTitle = 'foo';
-    const imgTitle = 'image';
+    const imgTitle = 'A Big Image';
+    const imgSlug = 'image';
     const wp = (imageUrl = '', imagePath = '', content = '') => {
       return `<rss><channel><title>test</title>
       <item><title>${postTitle}</title><wp:post_type>post</wp:post_type>
       <content:encoded><![CDATA[${content}]]></content:encoded></item>
       <item><title>${imgTitle}</title>
-      <link>http://localhost/wp/2020/07/07/${postTitle}/${imgTitle}/</link>
+      <link>http://localhost/wp/2020/07/07/${postTitle}/${imgSlug}/</link>
+      <wp:post_name>${imgSlug}</wp:post_name>
       <wp:post_type>attachment</wp:post_type>
       <wp:attachment_url>${imageUrl}</wp:attachment_url>
       <wp:postmeta>
@@ -484,6 +486,24 @@ describe('migrator', function() {
       const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
       const imagePath = '2020/07/hexo.png';
       const imgEmbed = `<p><img src="${imageUrl}" alt="${imageUrl}" /></p><p><img src="http://foo.com/bar.jpg" /></p>`;
+      const xml = wp(imageUrl, imagePath, imgEmbed);
+      const path = join(__dirname, 'image.xml');
+      await writeFile(path, xml);
+      await m({ _: [path], 'import-image': true });
+
+      const rendered = await readFile(join(hexo.source_dir, '_posts', postTitle + '.md'));
+      const output = parsePost(rendered, true);
+
+      output.should.eql(md(imgEmbed).replace(imageUrl + ')', '/' + imagePath + ')'));
+
+      await unlink(path);
+    });
+
+    // #102
+    it('content with ()', async () => {
+      const imageUrl = 'https://raw.githubusercontent.com/hexojs/hexo-migrator-wordpress/master/test/fixtures/hexo.png';
+      const imagePath = '2020/07/hexo.png';
+      const imgEmbed = `<p><img src="${imageUrl}" alt="${imageUrl}" />Lorem ipsum dolor sit amet (consectetur adipiscing elit)</p>`;
       const xml = wp(imageUrl, imagePath, imgEmbed);
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
