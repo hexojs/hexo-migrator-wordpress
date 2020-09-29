@@ -692,7 +692,7 @@ describe('migrator', function() {
     });
 
     it('invalid image link', async () => {
-      const imageUrl = 'http://does.not.exist/image.jpeg';
+      const imageUrl = 'http://foo.invalid/image.jpeg';
       const xml = wp(imageUrl, 'image.png');
       const path = join(__dirname, 'image.xml');
       await writeFile(path, xml);
@@ -729,7 +729,7 @@ describe('migrator', function() {
   });
 
   it('invalid url', async () => {
-    const url = 'http://does.not.exist/';
+    const url = 'http://foo.invalid/';
     try {
       await m({ _: [url] });
       should.fail();
