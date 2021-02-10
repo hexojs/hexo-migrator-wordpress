@@ -7,7 +7,7 @@ Migrate your blog from WordPress to [Hexo].
 
 ## Install
 
-In your blog folder, add this npm dependencie to your project:
+In your blog folder, add this npm dependency to your project:
 
 ``` bash
 $ npm install hexo-migrator-wordpress --save
